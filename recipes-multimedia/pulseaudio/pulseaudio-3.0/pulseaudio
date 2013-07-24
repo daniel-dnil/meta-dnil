@@ -1,0 +1,75 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:		pulseaudio
+# Required-Start:	$networking
+# Required-Stop:	
+# Default-Start:	2 3 4 5
+# Default-Stop:		1
+# Short-Description:	Pulseaudio Server in System Mode
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/pulseaudio
+NAME=pulseaudio
+DESC="Pulseaudio Server"
+PIDDIR=/var/run/pulse
+PIDFILE=$PIDDIR/pid
+DAEMONUSER=pulse
+
+NO_START=0
+DISALLOW_MODULE_LOADING=1
+
+set -e
+
+test "$NO_START" = "0" || exit 0
+test -x "$DAEMON" || exit 0
+
+pulseaudio_start () {
+        echo "Starting system PulseAudio Daemon"
+        if [ ! -d $PIDDIR ]; then
+                mkdir -p $PIDDIR
+                chown $DAEMONUSER:$DAEMONUSER $PIDDIR
+        fi
+        start-stop-daemon -x $DAEMON -p $PIDFILE --start -- --system --daemonize --high-priority \
+        --log-target=syslog --disallow-exit --disallow-module-loading=$DISALLOW_MODULE_LOADING
+        if [ -e /var/run/pulse/.esd_auth ]; then
+                chown pulse:pulse /var/run/pulse/.esd_auth
+                chmod 640 /var/run/pulse/.esd_auth
+        fi
+        if [ -e /var/run/pulse/.pulse-cookie ]; then
+                chown pulse:pulse /var/run/pulse/.pulse-cookie
+                chmod 640 /var/run/pulse/.pulse-cookie
+        fi
+}
+
+pulseaudio_stop () {
+        echo "Stopping system PulseAudio Daemon"
+        start-stop-daemon -p $PIDFILE --stop --retry 5 || echo -n "...which is not running"
+}
+
+case "$1" in
+        start|stop)
+                pulseaudio_${1}
+                ;;
+        restart|reload|force-reload)
+                if [ -s $PIDFILE ] && kill -0 $(cat $PIDFILE) >/dev/null 2>&1; then
+                        pulseaudio_stop
+                        pulseaudio_start
+                fi
+                ;;
+        force-stop)
+                pulseaudio_stop
+                killall pulseaudio || true
+                sleep 2
+                killall -9 pulseaudio || true
+                ;;
+        status)
+                status_of_proc -p $PIDFILE "$DAEMON" "system-wide PulseAudio" && exit 0 || exit $?
+                ;;
+        *)
+                echo "Usage: /etc/init.d/pulseaudio {start|stop|force-stop|restart|reload|force-reload|status}"
+                exit 1
+                ;;
+esac
+
+exit 0
