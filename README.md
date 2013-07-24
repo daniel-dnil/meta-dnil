@@ -1,50 +1,45 @@
 meta-dnil
 =========
 
-DNIL Yocto compatible layers
+DNIL Electronics Yocto compatible layers
+
 This README file contains information on the contents of the
 dnil layer.
 
 Please see the corresponding sections below for details.
-
 
 Dependencies
 ============
 
 This layer depends on:
 
-  URI: git://git.openembedded.org/bitbake
+  URI: https://github.com/beagleboard/
+  layers: meta-beagleboard
   branch: master
+  
+  URI: git://git.openembedded.org/meta-openembedded
+  layers: meta-oe, meta-networking
+  branch: dylan
 
-  URI: git://git.openembedded.org/openembedded-core
-  layers: meta
-  branch: master
-
-  URI: git://git.yoctoproject.org/xxxx
-  layers: xxxx
-  branch: master
+  URI: git://git.yoctoproject.org/poky
+  layers: meta, meta-yocto, meta-yocto-bsp
+  branch: dylan
 
 
 Patches
 =======
 
-Please submit any patches against the dnil layer to the
-xxxx mailing list (xxxx@zzzz.org) and cc: the maintainer:
+Please submit any patches against the dnil layer to the maintainer:
 
-Maintainer: XXX YYYYYY <xxx.yyyyyy@zzzzz.com>
-
+Maintainer: Daniel Nilsson <daniel@dnil.se>
 
 Table of Contents
 =================
 
   I. Adding the dnil layer to your build
- II. Misc
-
 
 I. Adding the dnil layer to your build
 =================================================
-
---- replace with specific instructions for the dnil layer ---
 
 In order to use this layer, you need to make the build system aware of
 it.
@@ -58,11 +53,8 @@ other layers needed. e.g.:
     /path/to/yocto/meta \
     /path/to/yocto/meta-yocto \
     /path/to/yocto/meta-yocto-bsp \
+    /path/to/yocto/meta-beagleboard/common-bsp \
+    /path/to/yocto/meta-openembedded/meta-oe \
+    /path/to/yocto/meta-openembedded/meta-networking \
     /path/to/yocto/meta-dnil \
     "
-
-
-II. Misc
-========
-
---- replace with specific information about the dnil layer ---
